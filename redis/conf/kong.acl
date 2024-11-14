@@ -1,0 +1,2 @@
+user default on >kong ~* +@all
+user rla-user on >rla-pass ~* +@all

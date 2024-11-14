@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  master:
+    image: redis:6.2.13
+    container_name: redis-master
+    ports:
+      - 6371:6371
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./conf/redis-1.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-1.acl:/usr/local/etc/redis/kong-1.acl
+    networks:
+      redis_sentinel_net:
+        ipv4_address: 172.23.0.101
+
+  slave-1:
+    image: redis:6.2.13
+    container_name: redis-slave-1
+    ports:
+      - 6372:6372
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./conf/redis-2.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-2.acl:/usr/local/etc/redis/kong-2.acl
+    networks:
+      redis_sentinel_net:
+        ipv4_address: 172.23.0.102
+
+  slave-2:
+    image: redis:6.2.13
+    container_name: redis-slave-2
+    ports:
+      - 6373:6373
+    volumes:
+      - ./conf/redis-3.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-3.acl:/usr/local/etc/redis/kong-3.acl
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      redis_sentinel_net:
+        ipv4_address: 172.23.0.103
+
+  sentinel-1:
+    image: redis:6.2.13
+    container_name: redis-sentinel-1
+    ports:
+      - 26379:26379
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    volumes:
+      - ./conf/sentinel-1.conf:/usr/local/etc/redis/sentinel.conf
+      - ./conf/sentinel-users-1.acl:/usr/local/etc/redis/sentinel-users.acl
+    networks:
+      redis_sentinel_net:
+        ipv4_address: 172.23.0.104
+  sentinel-2:
+    image: redis:6.2.13
+    container_name: redis-sentinel-2
+    ports:
+    - 26380:26380
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    volumes:
+      - ./conf/sentinel-2.conf:/usr/local/etc/redis/sentinel.conf
+      - ./conf/sentinel-users-2.acl:/usr/local/etc/redis/sentinel-users.acl
+    networks:
+      redis_sentinel_net:
+        ipv4_address: 172.23.0.105
+  sentinel-3:
+    image: redis:6.2.13
+    container_name: redis-sentinel-3
+    ports:
+      - 26381:26381
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    volumes:
+      - ./conf/sentinel-3.conf:/usr/local/etc/redis/sentinel.conf
+      - ./conf/sentinel-users-3.acl:/usr/local/etc/redis/sentinel-users.acl
+    networks:
+      redis_sentinel_net:
+        ipv4_address: 172.23.0.106
+
+networks:
+  redis_sentinel_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/24
+          gateway: 172.23.0.1

@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  redis_1:
+    image: redis:6.0.19
+    container_name: redis_1
+    ports:
+      - "6371:6371"
+      - "16371:16371"
+    volumes:
+      - ./conf/redis-1.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-1.acl:/usr/local/etc/redis/kong-1.acl
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.22.0.101
+
+  redis_2:
+    image: redis:6.0.19
+    container_name: redis_2
+    ports:
+      - "6372:6372"
+      - "16372:16372"
+    volumes:
+      - ./conf/redis-2.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-2.acl:/usr/local/etc/redis/kong-2.acl
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.22.0.102
+
+  redis_3:
+    image: redis:6.0.19
+    container_name: redis_3
+    ports:
+      - "6373:6373"
+      - "16373:16373"
+    volumes:
+      - ./conf/redis-3.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-3.acl:/usr/local/etc/redis/kong-3.acl
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.22.0.103
+  
+  redis_4:
+    image: redis:6.0.19
+    container_name: redis_4
+    ports:
+      - "6374:6374"
+      - "16374:16374"
+    volumes:
+      - ./conf/redis-4.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-4.acl:/usr/local/etc/redis/kong-4.acl
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.22.0.104
+
+  redis_5:
+    image: redis:6.0.19
+    container_name: redis_5
+    ports:
+      - "6375:6375"
+      - "16375:16375"
+    volumes:
+      - ./conf/redis-5.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-5.acl:/usr/local/etc/redis/kong-5.acl
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.22.0.105
+  
+  redis_6:
+    image: redis:6.0.19
+    container_name: redis_6
+    ports:
+      - "6376:6376"
+      - "16376:16376"
+    volumes:
+      - ./conf/redis-6.conf:/usr/local/etc/redis/redis.conf
+      - ./conf/kong-6.acl:/usr/local/etc/redis/kong-6.acl
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.22.0.106
+
+  redis-cluster-init:
+    image: redis:6.0.19
+    container_name: redis-cluster-init
+    restart: 'no'
+    tty: true
+    networks:
+      redis_cluster_net:
+        ipv4_address: 172.22.0.107
+    depends_on:
+      - redis_1
+      - redis_2
+      - redis_3
+      - redis_4
+      - redis_5
+      - redis_6
+    entrypoint: []
+    command: redis-cli --cluster create 172.22.0.101:6371 172.22.0.102:6372 172.22.0.103:6373 172.22.0.104:6374 172.22.0.105:6375 172.22.0.106:6376 --cluster-replicas 1 --cluster-yes
+
+
+# Rename the default network so we can easily identify it
+# Across all containers
+networks:
+  redis_cluster_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+          gateway: 172.22.0.1

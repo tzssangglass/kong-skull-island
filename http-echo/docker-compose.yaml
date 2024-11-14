@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  http-echo:
+    image: hashicorp/http-echo
+    container_name: http-echo
+    ports:
+      - '5678:5678'
+    command: ['-text="Hello World"']

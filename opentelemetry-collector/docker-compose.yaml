@@ -1,0 +1,19 @@
+services:
+  # Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: opentelemetry-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    ports:
+      - 55681:55681
+      - 4317:4317
+    volumes:
+      - ./otel-config.yaml:/etc/otel-collector-config.yaml
+
+  # Zipkin
+  zipkin-all-in-one:
+    container_name: zipkin
+    image: openzipkin/zipkin:latest
+    restart: always
+    ports:
+      - "9411:9411"

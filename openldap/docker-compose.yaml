@@ -1,0 +1,42 @@
+# inspired by https://github.com/ivangfr/springboot-kong-plugins
+
+version: "3.8"
+services:
+  openldap:
+    container_name: openldap
+    image: osixia/openldap:1.5.0
+    ports:
+      - "389:389"
+    environment:
+      LDAP_ORGANISATION: "MyCompany Inc."
+      LDAP_DOMAIN: "mycompany.com"
+    networks:
+      openldap_net:
+
+  openldap-import-users:
+    container_name: openldap-import-users
+    image: osixia/openldap:1.5.0
+    volumes:
+      - ./import-openldap-users.sh:/import-openldap-users.sh
+      - ./ldap/ldap-mycompany-com.ldif:/ldap-mycompany-com.ldif
+    depends_on:
+      - openldap
+    command: /import-openldap-users.sh
+    networks:
+      openldap_net:
+  phpldapadmin:
+    container_name: phpldapadmin
+    image: osixia/phpldapadmin:0.9.0
+    ports:
+      - "6443:443"
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+      PHPLDAPADMIN_SERVER_ADMIN: 100.85.185.92
+    depends_on:
+      - openldap
+    networks:
+      openldap_net:    
+
+networks:
+  openldap_net:
+    driver: bridge

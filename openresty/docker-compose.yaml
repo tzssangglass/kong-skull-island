@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  openresty:
+    image: docker.io/bitnami/openresty:1.21
+    container_name: openresty
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./nginx.conf:/opt/bitnami/openresty/nginx/conf/nginx.conf:ro
+
